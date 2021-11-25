@@ -7,7 +7,7 @@
     
     <table width='100%'>
     <tr>
-        <td><form></form><button (click)="DisplayImage()">Display Image</button></form></td>
+        <td><form><button onclick="DisplayImage()">Display Image</button></form></td>
         <td><form><button (click)="ClearCanvas()">Clear Canvas</button></form></td> 
         <td><form><button (click)="Download()">Download</button></form></td>
         <td><form><button (click)="Undo()">Undo</button></form></td>
@@ -15,14 +15,14 @@
         <td><form><button (click)="Save()">Save</button></form></td> 
     </tr>
     <tr>
-        <td><form><button (click)="brushType='Pen'">Pen</button></form></td> 
-        <td><form><button (click)="brushType='Eraser'">Eraser</button></form></td>
-        <td><form><button (click)="brushType='Line'">Line</button></form></td>
-        <td><form><button (click)="brushType='Rectangle'">Rectangle</button></form></td>
-        <td><form><button (click)="brushType='Circle'">Circle</button></form></td>
-        <td><form><button (click)="brushType='Heart'">Heart</button></form></td>
-        <td><form><button (click)="brushType='Star'">Star</button></form></td>
-        <td><form><button (click)="brushType='Triangle'">Triangle</button></form></td>
+        <td><form><button (click)="switchTool('Pen')">Pen</button></form></td> 
+        <td><form><button (click)="switchTool('Eraser')">Eraser</button></form></td>
+        <td><form><button (click)="switchTool('Line')">Line</button></form></td>
+        <td><form><button (click)="switchTool('Rectangle')">Rectangle</button></form></td>
+        <td><form><button (click)="switchTool('Circle')">Circle</button></form></td>
+        <td><form><button (click)="switchTool('Heart')">Heart</button></form></td>
+        <td><form><button (click)="switchTool('Square')">Square</button></form></td>
+        <td><form><button (click)="switchTool('Triangle')">Triangle</button></form></td>
     </tr>
     </table>
 </body>

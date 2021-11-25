@@ -1,19 +1,18 @@
-import { Component, ViewChild, ElementRef, OnInit } from '@angular/core';
+import { Component, ViewChild, ElementRef, OnInit, HostListener } from '@angular/core';
 
 @Component({
-  selector: 'app-root',
-  template: `
-    <canvas #canvas width="600" height="300"></canvas>
-    <button (click)="animate()">Play</button>   
-  `,
-  styles: ['canvas { border-style: solid }']
+    selector: 'canvas-comp',
+    templateUrl: './canvas.component.html',
+    styleUrls: ['./canvas.component.css']
 })
+
 export class CanvasComponent implements OnInit {
     constructor(private el: ElementRef, private img: HTMLImageElement) {
         this.canvas = el.nativeElement;
         this.ctx = this.canvas.nativeElement.getContext('2d')!;
         this.img = img;
     }
+
     @ViewChild('canvas', { static: true })
     canvas: ElementRef;
     ctx: CanvasRenderingContext2D;
@@ -25,7 +24,7 @@ export class CanvasComponent implements OnInit {
     brushColor = '#000000';                  //BrushColor is the color of the brush.
     brushOpacity = 1;                        //BrushOpacity is the opacity of the brush.
 
-    drawPoint = (e: MouseEvent) => {return void};
+    drawPoint:Function = this.drawPointPen;  // This is the function that is called when the user clicks on the canvas.
     nStartX = 0;
     nStartY = 0;
     bIsDrawing = false;
@@ -33,11 +32,14 @@ export class CanvasComponent implements OnInit {
     nDeltaY = 0;
     radius = 10;
 
+    @HostListener('window:mousedown', ['$event']) onclick(e: MouseEvent)  {this.putPoint(e);}
+    @HostListener('window:mousemove', ['$event']) onmove(e: MouseEvent)   {this.drawPoint(e);}
+    @HostListener('window:mouseup',   ['$event']) onup(e: MouseEvent)     {this.stopPoint();}
+        
     ngOnInit() {
         this.ctx.fillStyle = '#000';
         this.ctx.fillRect(0, 0, this.canvas.nativeElement.width, this.canvas.nativeElement.height);
     }
-
     ClearCanvas() {
         this.ctx.clearRect(0, 0, this.canvas.nativeElement.width, this.canvas.nativeElement.height);
     }
@@ -75,10 +77,7 @@ export class CanvasComponent implements OnInit {
 
 
 
-
-
-
-    putPoint(e: MouseEvent){ // e is event: e.clientX and e.clientY are the coordinates of the mouse.
+    putPoint(e: MouseEvent){    // e is event: e.clientX and e.clientY are the coordinates of the mouse.
         this.nStartX = e.clientX;
         this.nStartY = e.clientY;
         this.bIsDrawing = true;
@@ -87,28 +86,28 @@ export class CanvasComponent implements OnInit {
         this.bIsDrawing = false;
         this.RecordHistory();
     }
-    switchTool(choice:string, e: MouseEvent){
+    switchTool(choice:string){
         switch(choice){
             case 'Pen':
-                this.drawPoint = this.drawPointPen(e);break;
+                this.drawPoint = this.drawPointPen;      break;
             case 'Eraser':
-                this.drawPoint = this.drawPointEraser(e);break;
+                this.drawPoint = this.drawPointEraser;   break;
             case 'Circle':
-                this.drawPoint = this.drawPointCircle(e);break;
+                this.drawPoint = this.drawPointCircle;   break;
             case 'Heart':
-                this.drawPoint = this.drawPointHeart(e);break;
+                this.drawPoint = this.drawPointHeart;    break;
             case 'Line':
-                this.drawPoint = this.drawPointLine(e);break;
+                this.drawPoint = this.drawPointLine;     break;
             case 'Rectangle':
-                this.drawPoint = this.drawPointRectangle(e);break;
+                this.drawPoint = this.drawPointRectangle;break;
             case 'Triangle':
-                this.drawPoint = this.drawPointTriangle(e);break;
+                this.drawPoint = this.drawPointTriangle; break;
             case 'Square':
-                this.drawPoint = this.drawPointSquare(e);break;
+                this.drawPoint = this.drawPointSquare;   break;
         }
     }
     
-    drawPointPen(e: MouseEvent){  // This draws on mouse
+    drawPointPen(e: MouseEvent){        // This draws on mouse
         if(!this.bIsDrawing){
             return;
         }
@@ -119,7 +118,7 @@ export class CanvasComponent implements OnInit {
         this.nStartX = e.clientX;
         this.nStartY = e.clientY;
     }
-    drawPointEraser(e: MouseEvent){ // This erases on mouse
+    drawPointEraser(e: MouseEvent){     // This erases on mouse
         if(!this.bIsDrawing){return;}
         this.ctx.globalCompositeOperation = 'destination-out';
         this.ctx.beginPath();
@@ -129,7 +128,7 @@ export class CanvasComponent implements OnInit {
         this.nStartX = e.clientX;
         this.nStartY = e.clientY;
     }
-    drawPointCircle(e: MouseEvent){  // This draws circles.
+    drawPointCircle(e: MouseEvent){     // This draws circles.
         if(!this.bIsDrawing)
             return;
         this.nDeltaX = this.nStartX - e.clientX;
@@ -139,7 +138,7 @@ export class CanvasComponent implements OnInit {
         this.ctx.arc(this.nStartX, this.nStartY, this.radius, 0, Math.PI*2);
         this.ctx.fill();
     }
-    drawPointHeart(e: MouseEvent){  // This draws hearts.
+    drawPointHeart(e: MouseEvent){      // This draws hearts.
         if(!this.bIsDrawing)
             return;
         this.nDeltaX = this.nStartX - e.clientX;
@@ -151,7 +150,7 @@ export class CanvasComponent implements OnInit {
         this.ctx.bezierCurveTo(this.nStartX - this.radius, this.nStartY - this.radius, this.nStartX - this.radius, this.nStartY, this.nStartX, this.nStartY);
         this.ctx.fill();
     }
-    drawPointLine(e: MouseEvent){  // This draws lines.
+    drawPointLine(e: MouseEvent){       // This draws lines.
         if(!this.bIsDrawing)
             return;
         this.ctx.beginPath();
@@ -166,7 +165,7 @@ export class CanvasComponent implements OnInit {
         this.ctx.rect(this.nStartX, this.nStartY, e.clientX - this.nStartX, e.clientY - this.nStartY);
         this.ctx.fill();
     }
-    drawPointTriangle(e: MouseEvent){  // This draws triangles.
+    drawPointTriangle(e: MouseEvent){   // This draws triangles.
         if(!this.bIsDrawing)
             return;
         this.ctx.beginPath();
@@ -176,7 +175,7 @@ export class CanvasComponent implements OnInit {
         this.ctx.lineTo(this.nStartX, this.nStartY);
         this.ctx.fill();
     }
-    drawPointSquare(e: MouseEvent){  // This draws squares.
+    drawPointSquare(e: MouseEvent){     // This draws squares.
         if(!this.bIsDrawing)
             return;
         this.ctx.beginPath();
