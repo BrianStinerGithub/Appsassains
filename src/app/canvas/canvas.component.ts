@@ -2,19 +2,14 @@ import { Component, ViewChild, ElementRef, OnInit, HostListener } from '@angular
 
 @Component({
     selector: 'canvas-comp',
-    templateUrl: './canvas.component.html',
-    styleUrls: ['./canvas.component.css']
+    template: '<canvas #myCanvas></canvas>',
 })
 
 export class CanvasComponent implements OnInit {
-    constructor(private el: ElementRef, private img: HTMLImageElement) {
-        this.canvas = el.nativeElement;
-        this.ctx = this.canvas.nativeElement.getContext('2d')!;
-        this.img = img;
-    }
 
-    @ViewChild('canvas', { static: true })
-    canvas: ElementRef;
+
+    @ViewChild('myCanvas', { static: false }) mycanvas: ElementRef;
+
     ctx: CanvasRenderingContext2D;
     hist: Array<ImageData> = [];
     memory: number = 0;                      //Memory is a variable that holds the current index of the history array for undo and redo.
@@ -23,6 +18,12 @@ export class CanvasComponent implements OnInit {
     brushSize = 10;                          //BrushSize is the size of the brush.
     brushColor = '#000000';                  //BrushColor is the color of the brush.
     brushOpacity = 1;                        //BrushOpacity is the opacity of the brush.
+
+    constructor(private el: ElementRef, private img: HTMLImageElement) {
+        this.mycanvas = el.nativeElement;
+        this.ctx = this.mycanvas.nativeElement.getContext('2d')!;
+        this.img = img;
+    }
 
     drawPoint:Function = this.drawPointPen;  // This is the function that is called when the user clicks on the canvas.
     nStartX = 0;
@@ -38,10 +39,10 @@ export class CanvasComponent implements OnInit {
         
     ngOnInit() {
         this.ctx.fillStyle = '#000';
-        this.ctx.fillRect(0, 0, this.canvas.nativeElement.width, this.canvas.nativeElement.height);
+        this.ctx.fillRect(0, 0, this.mycanvas.nativeElement.width, this.mycanvas.nativeElement.height);
     }
     ClearCanvas() {
-        this.ctx.clearRect(0, 0, this.canvas.nativeElement.width, this.canvas.nativeElement.height);
+        this.ctx.clearRect(0, 0, this.mycanvas.nativeElement.width, this.mycanvas.nativeElement.height);
     }
     DisplayImage() {                                // TODO: Create a popup window to ask for user copy paste link
         this.img.src = 'example.png';
@@ -53,13 +54,13 @@ export class CanvasComponent implements OnInit {
     Download() {                                            //This oddly only works before any images are drawn.
         const link = document.createElement('a');           // create temporary link
         link.download = 'image.png';                        // set the name of the download file 
-        link.href = this.canvas.nativeElement.toDataURL();  // set the link to the data URL
+        link.href = this.mycanvas.nativeElement.toDataURL();  // set the link to the data URL
         link.click();                                       // click the link
         // delete the link link.delete;                               
     }
 
     RecordHistory() {
-        this.hist.push(this.ctx.getImageData(0, 0, this.canvas.nativeElement.width, this.canvas.nativeElement.height));
+        this.hist.push(this.ctx.getImageData(0, 0, this.mycanvas.nativeElement.width, this.mycanvas.nativeElement.height));
         this.memory = history.length - 1;
     }
     Undo() {
